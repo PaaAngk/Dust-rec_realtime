@@ -1,0 +1,24 @@
+<tui-root>
+  <div class="main">
+    <div class="videos-wrapper tui-space_horizontal-4 tui-space_vertical-4">
+      <!-- <app-video 
+        *ngFor="let link of videoList"  
+        [videoLink]="link"
+      ></app-video> -->
+      <app-video 
+        *ngFor="let link of videoList"  
+        [videoLink]="link"
+      ></app-video>
+    </div>
+    <div>
+      <h1>Statistics</h1>
+      <h3 *ngIf="objectsCount">{{ objectsCount }}</h3>
+      <h1 *ngIf="isAlarm">The peolpes more then 10</h1>
+    </div>
+    <div>
+      <app-table></app-table>
+    </div>
+  </div>
+
+  <router-outlet></router-outlet>
+  </tui-root>

@@ -1,0 +1,2 @@
+# specify the packages required for the module here
+scikit-image

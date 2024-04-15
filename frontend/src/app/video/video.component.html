@@ -1,0 +1,12 @@
+<div class="video-wrapper tui-shadow">
+	<tui-loader [showLoader]="loading" [overlay]="true">
+		<video
+			#video
+			class="video"
+			id="video"
+			(dblclick)="onDoubleClick()"
+			muted="muted"
+		></video>
+		<!-- autoplay="autoplay" -->
+	</tui-loader>
+</div>

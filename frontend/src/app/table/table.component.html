@@ -1,0 +1,89 @@
+<div class="table-wrapper tui-shadow">
+	<!-- <tui-loader [showLoader]="loading" [overlay]="true">
+		
+	</tui-loader> -->
+	<div class="calendar">
+		<tui-input-date-range
+			class="b-form"
+			[formControl]="control"
+			[items]="items"
+		>
+			Choose dates
+		</tui-input-date-range>
+
+		<button
+			appearance="primary"
+			tuiButton
+			size="m"
+			type="button"
+			(click)="search_click()"
+		>
+			Search
+		</button>
+	</div>
+	<div class="table">
+		<tui-scrollbar
+			waIntersectionRoot
+			class="scrollbar"
+			[hidden]="true"
+		>
+			<table
+				*ngIf="tableData.length > 0"
+				tuiTable
+				[columns]="columns"
+			>
+				<thead>
+					<tr tuiThGroup>
+						<th
+							*tuiHead="'dateFrom'"
+							tuiTh
+							[sticky]="true"
+						>
+							dateFrom
+						</th>
+						<th
+							*tuiHead="'dateTo'"
+							tuiTh
+							[sticky]="true"
+						>
+							dateTo
+						</th>
+						<th
+							*tuiHead="'duration'"
+							tuiTh
+							[sticky]="true"
+						>
+							Duration
+						</th>
+					</tr>
+				</thead>
+				
+				<tbody tuiTbody>
+					<tr
+						*ngFor="let item of tableData | tuiTableSort"
+						tuiTr
+					>
+						<td
+							*tuiCell="'dateFrom'"
+							tuiTd
+						>
+							{{ item.dateFrom }}
+						</td>
+						<td
+							*tuiCell="'dateTo'"
+							tuiTd
+						>
+							{{ item.dateTo }}
+						</td>
+						<td
+							*tuiCell="'duration'"
+							tuiTd
+						>
+							{{ item.duration }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</tui-scrollbar>
+	</div>
+</div>

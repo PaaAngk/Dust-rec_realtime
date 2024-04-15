@@ -1,0 +1,8 @@
+fastapi==0.109.2
+uvicorn[standard]
+pydantic
+loguru
+pyzmq==22.2.1
+savant_rs==0.2.13
+numpy==1.22.4
+redis

@@ -1,0 +1,123 @@
+# module name, required
+name: ${oc.env:MODULE_NAME, 'dust-rec'}
+
+# base module parameters
+parameters:
+  # DevMode (hot Python code reload on file change)
+  dev_mode: True
+  # Allows sending shutdown message to the module with the auth-key (see below)
+  shutdown_auth: "shutdown"
+  # enable OpenTelemetry
+  # telemetry:
+  #   tracing:
+  #     sampling_period: 100
+  #     root_span_name: pipeline
+  #     provider: jaeger
+  #     provider_params:
+  #       service_name: demo-pipeline
+  #       endpoint: jaeger:6831
+  # scripts/uri-input.py /test_data/city.mp4 --socket pub+connect:ipc:///tmp/zmq-sockets/input-video.ipc --sync
+
+  # pipeline processing frame parameters
+  # frame:
+  #   width: 1280
+  #   height: 720
+  #   # Add paddings to the frame before processing
+  # output_frame:
+  #   codec: raw-rgba
+  # # custom drawing on frames function
+  # draw_func:
+  #   module: src.module.overlay_draw_spec
+  #   class_name: Overlay
+  #   #kwargs:
+  #   rendered_objects:
+  #     peoplenet:
+  #       person:
+  #       face:
+  frame:
+    width: 1280
+    height: 720
+    # geometry_base: 4
+  output_frame:
+    codec: raw-rgba # ${oc.env:CODEC, 'h264'}
+  draw_func:
+    module: src.module.overlay_draw_spec
+    # specify the drawfunc's python class from the module
+    class_name: Overlay
+    kwargs:
+      overlay_height: 180
+  detected_object:
+    id: 0
+    label: person
+
+  batch_size: 1
+  detector: yolov8m
+  send_stats: True
+
+
+# pipeline definition
+pipeline:
+  # define pipeline's main elements
+  elements:
+    # primary detector element, inference is provided by the nvinfer Deepstream element
+    # model type is detector (other available types are: classifier, custom)
+    - element: nvinfer@detector
+      # Model's name in the pipeline, mandatory
+      name: yolov8m
+      # model definition
+      model:
+        remote:
+          url: s3://savant-data/models/yolov8m_f630b10/yolov8m_f630b10.zip
+          checksum_url: s3://savant-data/models/yolov8m_f630b10/yolov8m_f630b10.md5
+          parameters:
+            endpoint: https://eu-central-1.linodeobjects.com
+        format: onnx
+        # model file name, without location
+        model_file: yolov8m.onnx
+        config_file: config_infer_primary_yoloV8.txt
+        batch_size: ${parameters.batch_size}
+        # configuration of input data and custom preprocessing methods
+        workspace_size: 6144
+        # input:
+        #   # model input layer name
+        #   layer_name: input_1
+        #   # model input layer shape
+        #   shape: [3, 544, 960]
+        #   # pixel scaling/normalization factor
+        #   scale_factor: 0.0039215697906911373
+
+        # configuration of model output
+        output:
+          # model output layer names
+          # layer_names: [output_bbox/BiasAdd, output_cov/Sigmoid]
+          # number of detected classes for detector model
+          # num_detected_classes: 3
+          # specify which detected objects are included in output
+          objects:
+            - class_id: ${parameters.detected_object.id}
+              label: ${parameters.detected_object.label}
+
+            # object class id
+            # - class_id: 0
+            #   # label assigned to objects of this class id
+            #   label: person
+            #   selector:
+            #     kwargs:
+            #       # minimal width of the objects of this class to be included in output
+            #       min_width: 32
+            #       # minimal height of the objects of this class to be included in output
+            #       min_height: 32
+            # - class_id: 2
+            #   label: face
+            #   selector:
+            #     kwargs:
+            #       # minimal width of the objects of this class to be included in output
+            #       min_width: 16
+            #       # minimal height of the objects of this class to be included in output
+            #       min_height: 16
+
+    # custom pyfunc element
+    - element: pyfunc
+      module: src.module.custom_pyfunc
+      class_name: CustomPyFunc
+      #kwargs:
