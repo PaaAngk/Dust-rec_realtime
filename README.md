@@ -166,3 +166,13 @@ Open `rtsp://127.0.0.1:554/stream` in your player, or visit `http://127.0.0.1:88
 E.g., in case [Dockerfile.x86](docker/Dockerfile.x86) or [requirements.txt](./requirements.txt) were modified.
 
 Command Palette (F1) -> "Dev Containers: Rebuild container"
+
+
+
+
+## Run all project, without main module
+
+
+```bash
+docker compose up
+```
